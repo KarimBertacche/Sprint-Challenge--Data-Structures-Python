@@ -7,6 +7,9 @@ class RingBuffer:
         self.current = None
         self.storage = DoublyLinkedList()
 
+    def __len__(self):
+        return self.capacity
+
     def append(self, item):
         # check whether the current storage length is less than the capacity
         if len(self.storage) < self.capacity:
@@ -27,6 +30,16 @@ class RingBuffer:
                 # then make the current the tail of the storage
                 self.current = self.storage.tail
 
+    def choose_next(self, node):
+        # if the current pointer as a next
+        if node.next is not None:
+            # use that has the following node
+            next_node = node.next
+        else:
+            # else use the head of the storage
+            next_node = self.storage.head
+        return next_node
+
     def get(self):
         # Note:  This is the only [] allowed
         list_buffer_contents = []
@@ -36,36 +49,35 @@ class RingBuffer:
         initial_node = self.current
         # append the value from the starting node to the list buffer
         list_buffer_contents.append(initial_node.value)
-        # if the starting node as a next
-        if initial_node.next is not None:
-            # use that has the following node
-            next_node = initial_node.next
-        else:
-            # else use the head of the storage
-            next_node = self.storage.head
+        next_node = self.choose_next(initial_node)
 
         # while there are other node keep iterating
         while next_node != initial_node:
             # append the very next node value on each iteration to the buffer list
-            list_buffer_contents.append(next_node.value)
+            # if the node value is not None
+            if next_node.value is not None:
+                list_buffer_contents.append(next_node.value)
             # check if there is a next otherwise make storage head it
-            if next_node.next is not None:
-                next_node = next_node.next
-            else:
-                next_node = self.storage.head
+            next_node = self.choose_next(next_node)
         
         # return list of buffer
         return list_buffer_contents
 
 # ----------------Stretch Goal-------------------
 
-
 class ArrayRingBuffer:
     def __init__(self, capacity):
-        pass
+        # set the storage to be an instance of the class RingBuffer
+        self.storage = RingBuffer(capacity)
+        # iterate over the new instance of storage for the entire capacity
+        for __ in range(0, capacity):
+            # and place None as placeholders
+            self.storage.append(None)
 
     def append(self, item):
-        pass
+        # on append run the append method of the RingBuffer class instance
+        return self.storage.append(item)
 
     def get(self):
-        pass
+        # on get run the get method of the RingBuffer class instance
+        return self.storage.get()
